@@ -1,7 +1,6 @@
 import { notesLocal } from "../data/notes.js";
 
 export const getNotes = (req, res) => {
-  console.log("test");
   res.send(notesLocal);
 };
 
