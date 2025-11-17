@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon --legacy-watch app.js"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,8 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

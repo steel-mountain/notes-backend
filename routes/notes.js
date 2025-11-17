@@ -5,5 +5,5 @@ export const notesRouter = express.Router();
 
 notesRouter.get("/", getNotes);
 notesRouter.get("/:id", getNoteById);
-notesRouter.post("/", addNewNote);
-notesRouter.post("/:id", removeNote);
+notesRouter.post("/:id", addNewNote);
+notesRouter.delete("/:id", removeNote);
