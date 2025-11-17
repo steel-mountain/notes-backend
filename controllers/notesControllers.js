@@ -1,18 +1,8 @@
-import dotenv from "dotenv";
-import { MongoClient } from "mongodb";
-
-dotenv.config();
-
-const uri = process.env.MONGO_URL;
-const client = new MongoClient(uri);
+import { ObjectId } from "mongodb";
+import client from "./db.js";
 
 export const getNotes = async (req, res) => {
-  let dbConnected = false;
-
   try {
-    await client.connect();
-    dbConnected = true;
-
     const database = client.db("notesdb");
     const collection = database.collection("notes");
 
@@ -22,19 +12,13 @@ export const getNotes = async (req, res) => {
   } catch (err) {
     console.error("Ошибка получения данных из MongoDB:", err.message);
     res.status(500).json({ error: "Ошибка получения данных из MongoDB", message: err.message });
-  } finally {
-    if (dbConnected) await client.close();
   }
 };
 
 export const addNewNote = async (req, res) => {
   const newNote = req.body;
-  let dbConnected = false;
 
   try {
-    await client.connect();
-    dbConnected = true;
-
     const database = client.db("notesdb");
     const collection = database.collection("notes");
 
@@ -44,15 +28,33 @@ export const addNewNote = async (req, res) => {
   } catch (err) {
     console.error("Ошибка получения данных из MongoDB:", err.message);
     res.status(500).json({ error: "Ошибка получения данных из MongoDB", message: err.message });
-  } finally {
-    if (dbConnected) await client.close();
   }
 };
 
-export const getNoteById = (req, res) => {
-  res.send("note by id!");
+export const getNoteById = async (req, res) => {
+  res.send("getNoteById");
 };
 
-export const removeNote = (req, res) => {
-  res.send("remove note!");
+export const removeNote = async (req, res) => {
+  try {
+    console.log(req.params);
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "Не указан id заметки" });
+    }
+
+    const database = client.db("notesdb");
+    const collection = database.collection("notes");
+
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Заметка не найдена" });
+    }
+
+    res.json({ message: "Заметка удалена", id });
+  } catch (err) {
+    console.error("Ошибка удаления заметки:", err.message);
+    res.status(500).json({ error: "Ошибка удаления заметки", message: err.message });
+  }
 };
