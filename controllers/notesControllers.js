@@ -1,8 +1,9 @@
+import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
-import { notesLocal } from "../data/notes.js";
 
-// const uri = "mongodb://root:example@localhost:27017";
-const uri = "mongodb://root:example@mongo:27017";
+dotenv.config();
+
+const uri = process.env.MONGO_URL;
 const client = new MongoClient(uri);
 
 export const getNotes = async (req, res) => {
@@ -20,19 +21,15 @@ export const getNotes = async (req, res) => {
     res.json(notesFromDB);
   } catch (err) {
     console.error("Ошибка получения данных из MongoDB:", err.message);
-
-    res.json(notesLocal); // fallback если БД недоступна
+    res.status(500).json({ error: "Ошибка получения данных из MongoDB", message: err.message });
   } finally {
     if (dbConnected) await client.close();
   }
-  res.send(notesLocal);
 };
 
 export const addNewNote = async (req, res) => {
   const newNote = req.body;
   let dbConnected = false;
-
-  console.log("???");
 
   try {
     await client.connect();
@@ -45,11 +42,8 @@ export const addNewNote = async (req, res) => {
 
     res.send("Заметка успешно добавлена в базу данных!");
   } catch (err) {
-    console.error("Ошибка подключения к MongoDB:", err.message);
-
-    notesLocal.push(newNote);
-
-    res.send("База недоступна — заметка сохранена локально!");
+    console.error("Ошибка получения данных из MongoDB:", err.message);
+    res.status(500).json({ error: "Ошибка получения данных из MongoDB", message: err.message });
   } finally {
     if (dbConnected) await client.close();
   }
